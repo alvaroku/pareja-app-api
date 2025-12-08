@@ -1,0 +1,9 @@
+@ParejaAppAPI_HostAddress = http://localhost:5185
+
+GET {{ParejaAppAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+
+Add-Migration InitialCreate -OutputDir Data/Migrations

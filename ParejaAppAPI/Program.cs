@@ -1,0 +1,114 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging;
+using ParejaAppAPI.Data;
+using ParejaAppAPI.Endpoints;
+using ParejaAppAPI.Repositories;
+using ParejaAppAPI.Repositories.Interfaces;
+using ParejaAppAPI.Services;
+using ParejaAppAPI.Services.Interfaces;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+// Add services to the container
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Database
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// Repositories
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ICitaRepository, CitaRepository>();
+builder.Services.AddScoped<IMetaRepository, MetaRepository>();
+builder.Services.AddScoped<IMemoriaRepository, MemoriaRepository>();
+
+// Services
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<ICitaService, CitaService>();
+builder.Services.AddScoped<IMetaService, MetaService>();
+builder.Services.AddScoped<IMemoriaService, MemoriaService>();
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Map endpoints
+app.MapAuthEndpoints();
+app.MapUsuarioEndpoints();
+app.MapCitaEndpoints();
+app.MapMetaEndpoints();
+app.MapMemoriaEndpoints();
+
+// Ejecutar migraciones autom�ticas al arrancar (sincr�nico para evitar cambiar la firma de Main)
+using (var scope = app.Services.CreateScope())
+{
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+        logger.LogInformation("Se aplicaron las migraciones pendientes correctamente.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Error al aplicar migraciones de la base de datos.");
+        throw;
+    }
+}
+
+app.Run();
