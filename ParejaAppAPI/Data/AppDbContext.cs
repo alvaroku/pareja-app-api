@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<Meta> Metas { get; set; }
     public DbSet<Memoria> Memorias { get; set; }
     public DbSet<Pareja> Parejas { get; set; }
+    public DbSet<Resource> Resources { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

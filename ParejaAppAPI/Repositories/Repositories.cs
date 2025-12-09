@@ -64,6 +64,30 @@ public class MemoriaRepository : GenericRepository<Memoria>, IMemoriaRepository
     {
         return await _dbSet.Where(m => m.UsuarioId == usuarioId).ToListAsync();
     }
+
+    public async Task<IEnumerable<Memoria>> GetByUsuarioYParejaAsync(int usuarioId, int parejaId)
+    {
+        return await _dbSet
+            .Include(m => m.Resource)
+            .Where(m => m.UsuarioId == usuarioId || m.UsuarioId == parejaId)
+            .OrderByDescending(m => m.FechaMemoria)
+            .ToListAsync();
+    }
+}
+
+public class ResourceRepository : GenericRepository<Resource>, IResourceRepository
+{
+    public ResourceRepository(AppDbContext context) : base(context) { }
+
+    public async Task<Resource?> GetByMemoriaIdAsync(int memoriaId)
+    {
+        return await _dbSet.FirstOrDefaultAsync(r => r.Memoria.Id == memoriaId);
+    }
+
+    public async Task<Resource?> GetByUsuarioIdAsync(int usuarioId)
+    {
+        return await _dbSet.FirstOrDefaultAsync(r => r.Usuario.Id == usuarioId);
+    }
 }
 
 public class ParejaRepository : GenericRepository<Pareja>, IParejaRepository

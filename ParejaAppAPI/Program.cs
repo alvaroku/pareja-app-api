@@ -64,16 +64,19 @@ builder.Services.AddScoped<ICitaRepository, CitaRepository>();
 builder.Services.AddScoped<IMetaRepository, MetaRepository>();
 builder.Services.AddScoped<IMemoriaRepository, MemoriaRepository>();
 builder.Services.AddScoped<IParejaRepository, ParejaRepository>();
+builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
 
 // Services
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICitaService, CitaService>();
 builder.Services.AddScoped<IMetaService, MetaService>();
 builder.Services.AddScoped<IMemoriaService, MemoriaService>();
 builder.Services.AddScoped<IParejaService, ParejaService>();
+builder.Services.AddScoped<IResourceService, ResourceService>();
 
 var app = builder.Build();
 

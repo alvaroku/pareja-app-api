@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ParejaAppAPI.Data;
 
@@ -11,9 +12,11 @@ using ParejaAppAPI.Data;
 namespace ParejaAppAPI.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251209051648_resource")]
+    partial class resource
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -222,7 +225,12 @@ namespace ParejaAppAPI.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Resources");
                 });
@@ -248,6 +256,9 @@ namespace ParejaAppAPI.Data.Migrations
                     b.Property<DateTime?>("FechaAniversario")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FotoPerfil")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -259,9 +270,6 @@ namespace ParejaAppAPI.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ResourceId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Telefono")
                         .HasColumnType("nvarchar(max)");
 
@@ -269,10 +277,6 @@ namespace ParejaAppAPI.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ResourceId")
-                        .IsUnique()
-                        .HasFilter("[ResourceId] IS NOT NULL");
 
                     b.ToTable("Usuarios");
                 });
@@ -335,20 +339,18 @@ namespace ParejaAppAPI.Data.Migrations
                     b.Navigation("UsuarioRecibe");
                 });
 
-            modelBuilder.Entity("ParejaAppAPI.Models.Entities.Usuario", b =>
+            modelBuilder.Entity("ParejaAppAPI.Models.Entities.Resource", b =>
                 {
-                    b.HasOne("ParejaAppAPI.Models.Entities.Resource", "Resource")
-                        .WithOne("Usuario")
-                        .HasForeignKey("ParejaAppAPI.Models.Entities.Usuario", "ResourceId");
+                    b.HasOne("ParejaAppAPI.Models.Entities.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId");
 
-                    b.Navigation("Resource");
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("ParejaAppAPI.Models.Entities.Resource", b =>
                 {
                     b.Navigation("Memoria");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("ParejaAppAPI.Models.Entities.Usuario", b =>

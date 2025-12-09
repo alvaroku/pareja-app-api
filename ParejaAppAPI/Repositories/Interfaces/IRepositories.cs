@@ -23,6 +23,13 @@ public interface IMetaRepository : IGenericRepository<Meta>
 public interface IMemoriaRepository : IGenericRepository<Memoria>
 {
     Task<IEnumerable<Memoria>> GetByUsuarioIdAsync(int usuarioId);
+    Task<IEnumerable<Memoria>> GetByUsuarioYParejaAsync(int usuarioId, int parejaId);
+}
+
+public interface IResourceRepository : IGenericRepository<Resource>
+{
+    Task<Resource?> GetByMemoriaIdAsync(int memoriaId);
+    Task<Resource?> GetByUsuarioIdAsync(int usuarioId);
 }
 
 public interface IParejaRepository : IGenericRepository<Pareja>

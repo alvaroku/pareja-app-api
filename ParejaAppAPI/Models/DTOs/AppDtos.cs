@@ -21,9 +21,13 @@ public record CreateMetaDto(string Titulo, string? Descripcion, int UsuarioId);
 public record UpdateMetaDto(string Titulo, string? Descripcion, int Progreso, int Estado);
 
 // Memoria DTOs
-public record MemoriaResponse(int Id, string Titulo, string? Descripcion, string? UrlFoto, DateTime FechaMemoria, int UsuarioId);
-public record CreateMemoriaDto(string Titulo, string? Descripcion, string? UrlFoto, DateTime FechaMemoria, int UsuarioId);
-public record UpdateMemoriaDto(string Titulo, string? Descripcion, string? UrlFoto, DateTime FechaMemoria);
+public record MemoriaResponse(int Id, string Titulo, string? Descripcion, DateTime FechaMemoria, int UsuarioId, ResourceResponse? Resource);
+public record CreateMemoriaDto(string Titulo, string? Descripcion, DateTime FechaMemoria, int UsuarioId);
+public record UpdateMemoriaDto(string Titulo, string? Descripcion, DateTime FechaMemoria);
+
+// Resource DTOs
+public record ResourceResponse(int Id, string Nombre, string Extension, long Tamaño, string UrlPublica, int Tipo);
+public record UploadResourceDto(string Nombre, string Extension, string ContentType, int Tipo);
 
 // Pareja DTOs
 public record ParejaResponse(int Id, int UsuarioEnviaId, int UsuarioRecibeId, string UsuarioEnviaNombre, string UsuarioRecibeNombre, string UsuarioEnviaEmail, string UsuarioRecibeEmail, int Estado, DateTime CreatedAt);

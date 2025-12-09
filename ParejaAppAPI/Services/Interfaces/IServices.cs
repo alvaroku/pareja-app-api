@@ -45,6 +45,7 @@ public interface IMemoriaService
 {
     Task<Response<MemoriaResponse>> GetByIdAsync(int id);
     Task<Response<IEnumerable<MemoriaResponse>>> GetByUsuarioIdAsync(int usuarioId);
+    Task<Response<IEnumerable<MemoriaResponse>>> GetByUsuarioYParejaAsync(int usuarioId);
     Task<Response<PagedResponse<MemoriaResponse>>> GetPagedAsync(int pageNumber, int pageSize, int? usuarioId = null);
     Task<Response<MemoriaResponse>> CreateAsync(CreateMemoriaDto dto);
     Task<Response<MemoriaResponse>> UpdateAsync(int id, UpdateMemoriaDto dto);
