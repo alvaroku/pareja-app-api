@@ -18,6 +18,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Health Checks
+builder.Services.AddHealthChecks();
+
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -92,6 +95,11 @@ app.UseCors("AllowAngular");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Health Checks
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/ready");
+app.MapHealthChecks("/health/live");
 
 // Map endpoints
 app.MapAuthEndpoints();
