@@ -1,6 +1,6 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+dockerfilePath = "ParejaAppAPI/Dockerfile"
 
 [deploy]
 startCommand = "dotnet ParejaAppAPI.dll"
