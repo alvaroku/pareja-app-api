@@ -11,6 +11,7 @@ public interface IUsuarioRepository : IGenericRepository<Usuario>
 public interface ICitaRepository : IGenericRepository<Cita>
 {
     Task<IEnumerable<Cita>> GetByUsuarioIdAsync(int usuarioId);
+    Task<IEnumerable<Cita>> GetByUsuarioYParejaAsync(int usuarioId, int parejaId);
 }
 
 public interface IMetaRepository : IGenericRepository<Meta>

@@ -28,6 +28,14 @@ public class CitaRepository : GenericRepository<Cita>, ICitaRepository
     {
         return await _dbSet.Where(c => c.UsuarioId == usuarioId).ToListAsync();
     }
+
+    public async Task<IEnumerable<Cita>> GetByUsuarioYParejaAsync(int usuarioId, int parejaId)
+    {
+        return await _dbSet
+            .Where(c => c.UsuarioId == usuarioId || c.UsuarioId == parejaId)
+            .OrderByDescending(c => c.FechaHora)
+            .ToListAsync();
+    }
 }
 
 public class MetaRepository : GenericRepository<Meta>, IMetaRepository

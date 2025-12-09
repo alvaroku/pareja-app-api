@@ -23,6 +23,7 @@ public interface ICitaService
 {
     Task<Response<CitaResponse>> GetByIdAsync(int id);
     Task<Response<IEnumerable<CitaResponse>>> GetByUsuarioIdAsync(int usuarioId);
+    Task<Response<IEnumerable<CitaResponse>>> GetByUsuarioYParejaAsync(int usuarioId);
     Task<Response<PagedResponse<CitaResponse>>> GetPagedAsync(int pageNumber, int pageSize, int? usuarioId = null);
     Task<Response<CitaResponse>> CreateAsync(CreateCitaDto dto);
     Task<Response<CitaResponse>> UpdateAsync(int id, UpdateCitaDto dto);

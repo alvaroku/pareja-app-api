@@ -9,10 +9,12 @@ namespace ParejaAppAPI.Services;
 public class CitaService : ICitaService
 {
     private readonly ICitaRepository _repository;
+    private readonly IParejaRepository _parejaRepository;
 
-    public CitaService(ICitaRepository repository)
+    public CitaService(ICitaRepository repository, IParejaRepository parejaRepository)
     {
         _repository = repository;
+        _parejaRepository = parejaRepository;
     }
 
     public async Task<Response<CitaResponse>> GetByIdAsync(int id)
@@ -37,6 +39,35 @@ public class CitaService : ICitaService
         try
         {
             var citas = await _repository.GetByUsuarioIdAsync(usuarioId);
+            var response = citas.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora, c.Lugar, c.UsuarioId));
+            return Response<IEnumerable<CitaResponse>>.Success(response, 200);
+        }
+        catch (Exception ex)
+        {
+            return Response<IEnumerable<CitaResponse>>.Failure(500, "Error al obtener citas", new[] { ex.Message });
+        }
+    }
+
+    public async Task<Response<IEnumerable<CitaResponse>>> GetByUsuarioYParejaAsync(int usuarioId)
+    {
+        try
+        {
+            // Obtener pareja activa del usuario
+            var pareja = await _parejaRepository.GetParejaActivaByUsuarioIdAsync(usuarioId);
+
+            if (pareja == null)
+            {
+                // Si no tiene pareja, devolver solo sus citas
+                var citasUsuario = await _repository.GetByUsuarioIdAsync(usuarioId);
+                var responseUsuario = citasUsuario.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora, c.Lugar, c.UsuarioId));
+                return Response<IEnumerable<CitaResponse>>.Success(responseUsuario, 200);
+            }
+
+            // Determinar el ID de la pareja
+            var parejaId = pareja.UsuarioEnviaId == usuarioId ? pareja.UsuarioRecibeId : pareja.UsuarioEnviaId;
+
+            // Obtener citas del usuario y su pareja
+            var citas = await _repository.GetByUsuarioYParejaAsync(usuarioId, parejaId);
             var response = citas.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora, c.Lugar, c.UsuarioId));
             return Response<IEnumerable<CitaResponse>>.Success(response, 200);
         }
