@@ -24,3 +24,8 @@ public record UpdateMetaDto(string Titulo, string? Descripcion, int Progreso, st
 public record MemoriaResponse(int Id, string Titulo, string? Descripcion, string? UrlFoto, DateTime FechaMemoria, int UsuarioId);
 public record CreateMemoriaDto(string Titulo, string? Descripcion, string? UrlFoto, DateTime FechaMemoria, int UsuarioId);
 public record UpdateMemoriaDto(string Titulo, string? Descripcion, string? UrlFoto, DateTime FechaMemoria);
+
+// Pareja DTOs
+public record ParejaResponse(int Id, int UsuarioEnviaId, int UsuarioRecibeId, string UsuarioEnviaNombre, string UsuarioRecibeNombre, string UsuarioEnviaEmail, string UsuarioRecibeEmail, int Estado, DateTime CreatedAt);
+public record EnviarInvitacionDto(string EmailPareja);
+public record ResponderInvitacionDto(int ParejaId, int Estado); // 1 = Aceptar, 2 = Rechazar

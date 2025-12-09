@@ -49,3 +49,32 @@ public class MemoriaRepository : GenericRepository<Memoria>, IMemoriaRepository
         return await _dbSet.Where(m => m.UsuarioId == usuarioId).ToListAsync();
     }
 }
+
+public class ParejaRepository : GenericRepository<Pareja>, IParejaRepository
+{
+    public ParejaRepository(AppDbContext context) : base(context) { }
+
+    public async Task<Pareja?> GetParejaActivaByUsuarioIdAsync(int usuarioId)
+    {
+        return await _dbSet
+            .Include(p => p.UsuarioEnvia)
+            .Include(p => p.UsuarioRecibe)
+            .Where(p => (p.UsuarioEnviaId == usuarioId || p.UsuarioRecibeId == usuarioId) 
+                     && p.Estado == EstadoInvitacion.Aceptada 
+                     && !p.IsDeleted)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<Pareja?> GetInvitacionPendienteByUsuariosAsync(int usuario1Id, int usuario2Id)
+    {
+        return await _dbSet
+            .Include(p => p.UsuarioEnvia)
+            .Include(p => p.UsuarioRecibe)
+            .Where(p => ((p.UsuarioEnviaId == usuario1Id && p.UsuarioRecibeId == usuario2Id) 
+                      || (p.UsuarioEnviaId == usuario2Id && p.UsuarioRecibeId == usuario1Id))
+                     && p.Estado == EstadoInvitacion.Pendiente 
+                     && !p.IsDeleted)
+            .FirstOrDefaultAsync();
+    }
+}
+

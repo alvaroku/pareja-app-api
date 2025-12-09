@@ -63,14 +63,17 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<ICitaRepository, CitaRepository>();
 builder.Services.AddScoped<IMetaRepository, MetaRepository>();
 builder.Services.AddScoped<IMemoriaRepository, MemoriaRepository>();
+builder.Services.AddScoped<IParejaRepository, ParejaRepository>();
 
 // Services
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICitaService, CitaService>();
 builder.Services.AddScoped<IMetaService, MetaService>();
 builder.Services.AddScoped<IMemoriaService, MemoriaService>();
+builder.Services.AddScoped<IParejaService, ParejaService>();
 
 var app = builder.Build();
 
@@ -90,6 +93,7 @@ app.UseAuthorization();
 // Map endpoints
 app.MapAuthEndpoints();
 app.MapUsuarioEndpoints();
+app.MapParejaEndpoints();
 app.MapCitaEndpoints();
 app.MapMetaEndpoints();
 app.MapMemoriaEndpoints();

@@ -22,3 +22,9 @@ public interface IMemoriaRepository : IGenericRepository<Memoria>
 {
     Task<IEnumerable<Memoria>> GetByUsuarioIdAsync(int usuarioId);
 }
+
+public interface IParejaRepository : IGenericRepository<Pareja>
+{
+    Task<Pareja?> GetParejaActivaByUsuarioIdAsync(int usuarioId);
+    Task<Pareja?> GetInvitacionPendienteByUsuariosAsync(int usuario1Id, int usuario2Id);
+}

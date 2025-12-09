@@ -48,3 +48,11 @@ public interface IMemoriaService
     Task<Response<MemoriaResponse>> UpdateAsync(int id, UpdateMemoriaDto dto);
     Task<Response<bool>> DeleteAsync(int id);
 }
+
+public interface IParejaService
+{
+    Task<Response<ParejaResponse?>> GetParejaActivaAsync(int usuarioId);
+    Task<Response<ParejaResponse>> EnviarInvitacionAsync(int usuarioId, EnviarInvitacionDto dto);
+    Task<Response<ParejaResponse>> ResponderInvitacionAsync(int usuarioId, ResponderInvitacionDto dto);
+    Task<Response<bool>> EliminarParejaAsync(int usuarioId);
+}
