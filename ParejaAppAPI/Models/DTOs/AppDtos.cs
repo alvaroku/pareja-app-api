@@ -16,9 +16,9 @@ public record CreateCitaDto(string Titulo, string? Descripcion, DateTime FechaHo
 public record UpdateCitaDto(string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar);
 
 // Meta DTOs
-public record MetaResponse(int Id, string Titulo, string? Descripcion, int Progreso, string Estado, int UsuarioId);
+public record MetaResponse(int Id, string Titulo, string? Descripcion, int Progreso, int Estado, int UsuarioId);
 public record CreateMetaDto(string Titulo, string? Descripcion, int UsuarioId);
-public record UpdateMetaDto(string Titulo, string? Descripcion, int Progreso, string Estado);
+public record UpdateMetaDto(string Titulo, string? Descripcion, int Progreso, int Estado);
 
 // Memoria DTOs
 public record MemoriaResponse(int Id, string Titulo, string? Descripcion, string? UrlFoto, DateTime FechaMemoria, int UsuarioId);

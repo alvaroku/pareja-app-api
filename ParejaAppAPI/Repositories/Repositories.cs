@@ -46,6 +46,14 @@ public class MetaRepository : GenericRepository<Meta>, IMetaRepository
     {
         return await _dbSet.Where(m => m.UsuarioId == usuarioId).ToListAsync();
     }
+
+    public async Task<IEnumerable<Meta>> GetByUsuarioYParejaAsync(int usuarioId, int parejaId)
+    {
+        return await _dbSet
+            .Where(m => m.UsuarioId == usuarioId || m.UsuarioId == parejaId)
+            .OrderByDescending(m => m.CreatedAt)
+            .ToListAsync();
+    }
 }
 
 public class MemoriaRepository : GenericRepository<Memoria>, IMemoriaRepository

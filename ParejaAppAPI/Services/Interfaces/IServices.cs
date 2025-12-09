@@ -34,6 +34,7 @@ public interface IMetaService
 {
     Task<Response<MetaResponse>> GetByIdAsync(int id);
     Task<Response<IEnumerable<MetaResponse>>> GetByUsuarioIdAsync(int usuarioId);
+    Task<Response<IEnumerable<MetaResponse>>> GetByUsuarioYParejaAsync(int usuarioId);
     Task<Response<PagedResponse<MetaResponse>>> GetPagedAsync(int pageNumber, int pageSize, int? usuarioId = null);
     Task<Response<MetaResponse>> CreateAsync(CreateMetaDto dto);
     Task<Response<MetaResponse>> UpdateAsync(int id, UpdateMetaDto dto);
