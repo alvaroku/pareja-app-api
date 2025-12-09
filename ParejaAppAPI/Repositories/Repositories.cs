@@ -11,7 +11,9 @@ public class UsuarioRepository : GenericRepository<Usuario>, IUsuarioRepository
 
     public async Task<Usuario?> GetByEmailAsync(string email)
     {
-        return await _dbSet.FirstOrDefaultAsync(u => u.Email == email);
+        return await _dbSet
+            .Include(u => u.Resource)
+            .FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<Usuario?> GetByTelefonoAsync(string telefono)

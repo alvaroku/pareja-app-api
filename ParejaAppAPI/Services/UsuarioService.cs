@@ -15,15 +15,28 @@ public class UsuarioService : IUsuarioService
         _repository = repository;
     }
 
+    private ResourceResponse? MapResource(Resource? resource)
+    {
+        if (resource == null) return null;
+        return new ResourceResponse(resource.Id, resource.Nombre, resource.Extension, resource.Tamaño, resource.UrlPublica, (int)resource.Tipo);
+    }
+
     public async Task<Response<UsuarioResponse>> GetByIdAsync(int id)
     {
         try
         {
-            var usuario = await _repository.GetByIdAsync(id);
+            var usuario = await _repository.GetByIdAsync(id,includes:x=>x.Resource);
             if (usuario == null)
                 return Response<UsuarioResponse>.Failure(404, "Usuario no encontrado");
 
-            var response = new UsuarioResponse(usuario.Id, usuario.Nombre,usuario.CodigoPais,usuario.Telefono, usuario.Email);
+            var response = new UsuarioResponse(
+                usuario.Id, 
+                usuario.Nombre, 
+                usuario.Email, 
+                usuario.CodigoPais, 
+                usuario.Telefono, 
+                MapResource(usuario.Resource)
+            );
             return Response<UsuarioResponse>.Success(response, 200);
         }
         catch (Exception ex)
@@ -37,7 +50,14 @@ public class UsuarioService : IUsuarioService
         try
         {
             var usuarios = await _repository.GetAllAsync();
-            var response = usuarios.Select(u => new UsuarioResponse(u.Id, u.Nombre, u.Email,u.CodigoPais,u.Telefono));
+            var response = usuarios.Select(u => new UsuarioResponse(
+                u.Id, 
+                u.Nombre, 
+                u.Email, 
+                u.CodigoPais, 
+                u.Telefono, 
+                MapResource(u.Resource)
+            ));
             return Response<IEnumerable<UsuarioResponse>>.Success(response, 200);
         }
         catch (Exception ex)
@@ -51,7 +71,14 @@ public class UsuarioService : IUsuarioService
         try
         {
             var (items, totalCount) = await _repository.GetPagedAsync(pageNumber, pageSize);
-            var usuarioResponses = items.Select(u => new UsuarioResponse(u.Id, u.Nombre, u.Email,u.CodigoPais,u.Telefono));
+            var usuarioResponses = items.Select(u => new UsuarioResponse(
+                u.Id, 
+                u.Nombre, 
+                u.Email, 
+                u.CodigoPais, 
+                u.Telefono, 
+                MapResource(u.Resource)
+            ));
             var pagedResponse = new PagedResponse<UsuarioResponse>(usuarioResponses, pageNumber, pageSize, totalCount);
             return Response<PagedResponse<UsuarioResponse>>.Success(pagedResponse, 200);
         }
@@ -79,7 +106,14 @@ public class UsuarioService : IUsuarioService
             };
 
             await _repository.AddAsync(usuario);
-            var response = new UsuarioResponse(usuario.Id, usuario.Nombre, usuario.Email,usuario.CodigoPais,usuario.Telefono);
+            var response = new UsuarioResponse(
+                usuario.Id, 
+                usuario.Nombre, 
+                usuario.Email, 
+                usuario.CodigoPais, 
+                usuario.Telefono, 
+                null
+            );
             return Response<UsuarioResponse>.Success(response, 201);
         }
         catch (Exception ex)
@@ -120,7 +154,14 @@ public class UsuarioService : IUsuarioService
             usuario.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(usuario);
-            var response = new UsuarioResponse(usuario.Id, usuario.Nombre, usuario.Email, usuario.CodigoPais, usuario.Telefono);
+            var response = new UsuarioResponse(
+                usuario.Id, 
+                usuario.Nombre, 
+                usuario.Email, 
+                usuario.CodigoPais, 
+                usuario.Telefono, 
+                MapResource(usuario.Resource)
+            );
             return Response<UsuarioResponse>.Success(response, 200);
         }
         catch (Exception ex)

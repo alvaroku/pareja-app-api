@@ -3,10 +3,10 @@ namespace ParejaAppAPI.Models.DTOs;
 // Auth DTOs
 public record LoginDto(string Email, string Password);
 public record RegisterDto(string Nombre, string Email, string Password, string? CodigoPais, string? Telefono);
-public record AuthResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, string Token);
+public record AuthResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource, string Token);
 
 // Usuario DTOs
-public record UsuarioResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono);
+public record UsuarioResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource);
 public record CreateUsuarioDto(string Nombre, string Email, string Password, string? CodigoPais, string? Telefono);
 public record UpdateUsuarioDto(string Nombre, string Email, string? CodigoPais, string? Telefono);
 

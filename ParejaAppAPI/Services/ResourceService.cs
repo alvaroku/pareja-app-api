@@ -10,12 +10,18 @@ public class ResourceService : IResourceService
 {
     private readonly IResourceRepository _resourceRepository;
     private readonly IMemoriaRepository _memoriaRepository;
+    private readonly IUsuarioRepository _usuarioRepository;
     private readonly IFirebaseStorageService _firebaseStorage;
 
-    public ResourceService(IResourceRepository resourceRepository, IMemoriaRepository memoriaRepository, IFirebaseStorageService firebaseStorage)
+    public ResourceService(
+        IResourceRepository resourceRepository, 
+        IMemoriaRepository memoriaRepository, 
+        IUsuarioRepository usuarioRepository,
+        IFirebaseStorageService firebaseStorage)
     {
         _resourceRepository = resourceRepository;
         _memoriaRepository = memoriaRepository;
+        _usuarioRepository = usuarioRepository;
         _firebaseStorage = firebaseStorage;
     }
 
@@ -116,6 +122,63 @@ public class ResourceService : IResourceService
         catch (Exception ex)
         {
             return Response<ResourceResponse>.Failure(500, "Error al obtener resource", new[] { ex.Message });
+        }
+    }
+
+    public async Task<Response<ResourceResponse>> UploadForUsuarioAsync(int usuarioId, Stream fileStream, string fileName, string contentType)
+    {
+        try
+        {
+            var usuario = await _usuarioRepository.GetByIdAsync(usuarioId);
+            if (usuario == null)
+                return Response<ResourceResponse>.Failure(404, "Usuario no encontrado");
+
+            // Si ya tiene un Resource, eliminar el anterior de Firebase
+            if (usuario.ResourceId.HasValue)
+            {
+                var oldResource = await _resourceRepository.GetByIdAsync(usuario.ResourceId.Value);
+                if (oldResource != null && !string.IsNullOrEmpty(oldResource.UrlPublica))
+                {
+                    await _firebaseStorage.DeleteFileAsync(oldResource.UrlPublica);
+                    await _resourceRepository.DeleteAsync(oldResource.Id);
+                }
+            }
+
+            // Subir nuevo archivo a Firebase
+            var uploadResult = await _firebaseStorage.UploadFileAsync(fileStream, fileName, contentType, "usuarios");
+            if (!uploadResult.IsSuccess)
+                return Response<ResourceResponse>.Failure(uploadResult.StatusCode, uploadResult.Message, uploadResult?.Errors?.ToArray());
+
+            // Determinar tipo de recurso por extensión
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+            var tipo = DeterminarTipoRecurso(extension);
+
+            // Crear registro de Resource
+            var resource = new Resource
+            {
+                Nombre = fileName,
+                Extension = extension,
+                Tamaño = fileStream.Length,
+                UrlPublica = uploadResult.Data!,
+                Ubicacion = $"usuarios/{fileName}",
+                Tipo = tipo,
+                ContentType = contentType,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _resourceRepository.AddAsync(resource);
+
+            // Actualizar Usuario con ResourceId
+            usuario.Resource = resource;
+            usuario.UpdatedAt = DateTime.UtcNow;
+            await _usuarioRepository.UpdateAsync(usuario);
+
+            var response = new ResourceResponse(resource.Id, resource.Nombre, resource.Extension, resource.Tamaño, resource.UrlPublica, (int)resource.Tipo);
+            return Response<ResourceResponse>.Success(response, 201);
+        }
+        catch (Exception ex)
+        {
+            return Response<ResourceResponse>.Failure(500, "Error al subir foto de perfil", new[] { ex.Message });
         }
     }
 

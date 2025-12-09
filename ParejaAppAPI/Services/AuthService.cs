@@ -17,6 +17,12 @@ public class AuthService : IAuthService
         _jwtService = jwtService;
     }
 
+    private ResourceResponse? MapResource(Resource? resource)
+    {
+        if (resource == null) return null;
+        return new ResourceResponse(resource.Id, resource.Nombre, resource.Extension, resource.Tamaño, resource.UrlPublica, (int)resource.Tipo);
+    }
+
     public async Task<Response<AuthResponse>> LoginAsync(LoginDto dto)
     {
         try
@@ -35,6 +41,7 @@ public class AuthService : IAuthService
                 usuario.Email,
                 usuario.CodigoPais,
                 usuario.Telefono,
+                MapResource(usuario.Resource),
                 token
             );
 
@@ -81,6 +88,7 @@ public class AuthService : IAuthService
                 usuario.Email,
                 usuario.CodigoPais,
                 usuario.Telefono,
+                null,
                 token
             );
 
