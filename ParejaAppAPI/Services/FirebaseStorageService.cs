@@ -2,23 +2,30 @@ using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Storage.V1;
 using ParejaAppAPI.Models.Responses;
 using ParejaAppAPI.Services.Interfaces;
+using System.Text;
 
 namespace ParejaAppAPI.Services;
 
 public class FirebaseStorageService : IFirebaseStorageService
 {
     private readonly string _bucket;
-    private readonly string _credentialsPath;
+    private readonly string _credentials;
 
     public FirebaseStorageService(IConfiguration configuration)
     {
         _bucket = configuration["Firebase:StorageBucket"] ?? throw new ArgumentNullException("Firebase:StorageBucket");
-        _credentialsPath = configuration["Firebase:CredentialsPath"] ?? throw new ArgumentNullException("Firebase:CredentialsPath");
+        _credentials = configuration["Firebase:Credentials"] ?? throw new ArgumentNullException("Firebase:Credentials");
     }
 
     private GoogleCredential GetCredentials()
     {
-        return GoogleCredential.FromFile(_credentialsPath);
+        var base64 = _credentials;
+        if (string.IsNullOrWhiteSpace(base64))
+            throw new InvalidOperationException("Falta Firebase:Credentials en configuración.");
+
+        var json = Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+        var credential = GoogleCredential.FromJson(json);
+        return credential;
     }
 
     public async Task<Response<string>> UploadFileAsync(Stream fileStream, string fileName, string contentType, string folder = "memorias")
