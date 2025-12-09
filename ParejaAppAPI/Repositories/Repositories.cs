@@ -64,7 +64,11 @@ public class MemoriaRepository : GenericRepository<Memoria>, IMemoriaRepository
 
     public async Task<IEnumerable<Memoria>> GetByUsuarioIdAsync(int usuarioId)
     {
-        return await _dbSet.Where(m => m.UsuarioId == usuarioId).ToListAsync();
+        return await _dbSet
+            .Include(x => x.Resource)
+            .Where(m => m.UsuarioId == usuarioId)
+            .OrderByDescending(m => m.FechaMemoria)
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Memoria>> GetByUsuarioYParejaAsync(int usuarioId, int parejaId)
