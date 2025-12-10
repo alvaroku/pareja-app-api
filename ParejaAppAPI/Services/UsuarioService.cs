@@ -25,7 +25,7 @@ public class UsuarioService : IUsuarioService
     {
         try
         {
-            var usuario = await _repository.GetByIdAsync(id,includes:x=>x.Resource);
+            var usuario = await _repository.GetByIdAsync(id,includes:x=>x.ProfilePhoto);
             if (usuario == null)
                 return Response<UsuarioResponse>.Failure(404, "Usuario no encontrado");
 
@@ -35,7 +35,7 @@ public class UsuarioService : IUsuarioService
                 usuario.Email, 
                 usuario.CodigoPais, 
                 usuario.Telefono, 
-                MapResource(usuario.Resource)
+                MapResource(usuario.ProfilePhoto)
             );
             return Response<UsuarioResponse>.Success(response, 200);
         }
@@ -56,7 +56,7 @@ public class UsuarioService : IUsuarioService
                 u.Email, 
                 u.CodigoPais, 
                 u.Telefono, 
-                MapResource(u.Resource)
+                MapResource(u.ProfilePhoto)
             ));
             return Response<IEnumerable<UsuarioResponse>>.Success(response, 200);
         }
@@ -77,7 +77,7 @@ public class UsuarioService : IUsuarioService
                 u.Email, 
                 u.CodigoPais, 
                 u.Telefono, 
-                MapResource(u.Resource)
+                MapResource(u.ProfilePhoto)
             ));
             var pagedResponse = new PagedResponse<UsuarioResponse>(usuarioResponses, pageNumber, pageSize, totalCount);
             return Response<PagedResponse<UsuarioResponse>>.Success(pagedResponse, 200);
@@ -160,7 +160,7 @@ public class UsuarioService : IUsuarioService
                 usuario.Email, 
                 usuario.CodigoPais, 
                 usuario.Telefono, 
-                MapResource(usuario.Resource)
+                MapResource(usuario.ProfilePhoto)
             );
             return Response<UsuarioResponse>.Success(response, 200);
         }

@@ -12,7 +12,7 @@ public class UsuarioRepository : GenericRepository<Usuario>, IUsuarioRepository
     public async Task<Usuario?> GetByEmailAsync(string email)
     {
         return await _dbSet
-            .Include(u => u.Resource)
+            .Include(u => u.ProfilePhoto)
             .FirstOrDefaultAsync(u => u.Email == email);
     }
 

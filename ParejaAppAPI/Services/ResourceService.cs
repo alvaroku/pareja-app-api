@@ -134,9 +134,9 @@ public class ResourceService : IResourceService
                 return Response<ResourceResponse>.Failure(404, "Usuario no encontrado");
 
             // Si ya tiene un Resource, eliminar el anterior de Firebase
-            if (usuario.ResourceId.HasValue)
+            if (usuario.ProfilePhotoId.HasValue)
             {
-                var oldResource = await _resourceRepository.GetByIdAsync(usuario.ResourceId.Value);
+                var oldResource = await _resourceRepository.GetByIdAsync(usuario.ProfilePhotoId.Value);
                 if (oldResource != null && !string.IsNullOrEmpty(oldResource.UrlPublica))
                 {
                     await _firebaseStorage.DeleteFileAsync(oldResource.UrlPublica);
@@ -169,7 +169,7 @@ public class ResourceService : IResourceService
             await _resourceRepository.AddAsync(resource);
 
             // Actualizar Usuario con ResourceId
-            usuario.Resource = resource;
+            usuario.ProfilePhoto = resource;
             usuario.UpdatedAt = DateTime.UtcNow;
             await _usuarioRepository.UpdateAsync(usuario);
 

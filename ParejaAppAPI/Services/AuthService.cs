@@ -41,7 +41,7 @@ public class AuthService : IAuthService
                 usuario.Email,
                 usuario.CodigoPais,
                 usuario.Telefono,
-                MapResource(usuario.Resource),
+                MapResource(usuario.ProfilePhoto),
                 token
             );
 
