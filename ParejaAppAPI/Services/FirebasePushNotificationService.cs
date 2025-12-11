@@ -80,5 +80,13 @@ namespace ParejaAppAPI.Services
         {
             await EnviarNotificacionAsync(notification.Token, notification.Titulo, notification.Cuerpo, notification.AdditionalData);
         }
+
+        public async Task SendNotificationAsync(List<string> tokens, string titulo, string mensaje, Dictionary<string, string> dictionary)
+        {
+            foreach (var token in tokens)
+            {
+                await EnviarNotificacionAsync(token, titulo, mensaje, dictionary);
+            }
+        }
     }
 }

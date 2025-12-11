@@ -11,9 +11,9 @@ public record CreateUsuarioDto(string Nombre, string Email, string Password, str
 public record UpdateUsuarioDto(string Nombre, string Email, string? CodigoPais, string? Telefono, int? Role, string? TimeZone);
 
 // Cita DTOs
-public record CitaResponse(int Id, string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar, int UsuarioId);
-public record CreateCitaDto(string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar, int UsuarioId);
-public record UpdateCitaDto(string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar);
+public record CitaResponse(int Id, string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar, int MinutosAntesNotificar, int UsuarioId);
+public record CreateCitaDto(string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar, int MinutosAntesNotificar, int UsuarioId);
+public record UpdateCitaDto(string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar, int MinutosAntesNotificar);
 
 // Meta DTOs
 public record MetaResponse(int Id, string Titulo, string? Descripcion, int Progreso, int Estado, int UsuarioId);

@@ -88,6 +88,7 @@ builder.Services.AddScoped<IResourceService, ResourceService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddHostedService<NotificationDispatcherWorker>();
+builder.Services.AddHostedService<CitaReminderWorker>();
 
 builder.Services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
 builder.Services.AddScoped<ISMSService, TwilioSMSService>();

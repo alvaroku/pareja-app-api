@@ -28,9 +28,9 @@ public class CitaService : ICitaService
             var cita = await _repository.GetByIdAsync(id, c => c.Usuario);
             if (cita == null)
                 return Response<CitaResponse>.Failure(404, "Cita no encontrada");
-           
+
             var fechaHoraLocal = cita.FechaHora.ToTimeZone(await _usuarioService.GetUserTimeZoneAsync(currentUserId));
-            var response = new CitaResponse(cita.Id, cita.Titulo, cita.Descripcion, fechaHoraLocal, cita.Lugar, cita.UsuarioId);
+            var response = new CitaResponse(cita.Id, cita.Titulo, cita.Descripcion, fechaHoraLocal, cita.Lugar, cita.MinutosAntesNotificar, cita.UsuarioId);
             return Response<CitaResponse>.Success(response, 200);
         }
         catch (Exception ex)
@@ -45,7 +45,7 @@ public class CitaService : ICitaService
         {
             var citas = await _repository.GetByUsuarioIdAsync(usuarioId);
             string? timeZone = await _usuarioService.GetUserTimeZoneAsync(currentUserId);
-            var response = citas.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.UsuarioId));
+            var response = citas.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.MinutosAntesNotificar, c.UsuarioId));
             return Response<IEnumerable<CitaResponse>>.Success(response, 200);
         }
         catch (Exception ex)
@@ -65,7 +65,7 @@ public class CitaService : ICitaService
             {
                 // Si no tiene pareja, devolver solo sus citas
                 var citasUsuario = await _repository.GetByUsuarioIdAsync(currentUserId);
-                var responseUsuario = citasUsuario.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.UsuarioId));
+                var responseUsuario = citasUsuario.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.MinutosAntesNotificar, c.UsuarioId));
                 return Response<IEnumerable<CitaResponse>>.Success(responseUsuario, 200);
             }
 
@@ -74,7 +74,7 @@ public class CitaService : ICitaService
 
             // Obtener citas del usuario y su pareja
             var citas = await _repository.GetByUsuarioYParejaAsync(currentUserId, parejaId);
-            var response = citas.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.UsuarioId));
+            var response = citas.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.MinutosAntesNotificar, c.UsuarioId));
             return Response<IEnumerable<CitaResponse>>.Success(response, 200);
         }
         catch (Exception ex)
@@ -92,7 +92,7 @@ public class CitaService : ICitaService
                 : await _repository.GetPagedAsync(pageNumber, pageSize);
 
             string? timeZone = await _usuarioService.GetUserTimeZoneAsync(currentUserId);
-            var citaResponses = items.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.UsuarioId));
+            var citaResponses = items.Select(c => new CitaResponse(c.Id, c.Titulo, c.Descripcion, c.FechaHora.ToTimeZone(timeZone), c.Lugar, c.MinutosAntesNotificar, c.UsuarioId));
             var pagedResponse = new PagedResponse<CitaResponse>(citaResponses, pageNumber, pageSize, totalCount);
             return Response<PagedResponse<CitaResponse>>.Success(pagedResponse, 200);
         }
@@ -112,6 +112,7 @@ public class CitaService : ICitaService
                 Descripcion = dto.Descripcion,
                 FechaHora = dto.FechaHora,
                 Lugar = dto.Lugar,
+                MinutosAntesNotificar = dto.MinutosAntesNotificar,
                 UsuarioId = dto.UsuarioId,
                 CreatedAt = DateTime.UtcNow
             };
@@ -121,7 +122,7 @@ public class CitaService : ICitaService
             string? timeZone = await _usuarioService.GetUserTimeZoneAsync(currentUserId);
             // Devolver la fecha en el timezone del usuario
             var fechaHoraLocal = cita.FechaHora.ToTimeZone(timeZone);
-            var response = new CitaResponse(cita.Id, cita.Titulo, cita.Descripcion, fechaHoraLocal, cita.Lugar, cita.UsuarioId);
+            var response = new CitaResponse(cita.Id, cita.Titulo, cita.Descripcion, fechaHoraLocal, cita.Lugar, cita.MinutosAntesNotificar, cita.UsuarioId);
             return Response<CitaResponse>.Success(response, 201);
         }
         catch (Exception ex)
@@ -137,11 +138,13 @@ public class CitaService : ICitaService
             var cita = await _repository.GetByIdAsync(id);
             if (cita == null)
                 return Response<CitaResponse>.Failure(404, "Cita no encontrada");
-            
+
             cita.Titulo = dto.Titulo;
             cita.Descripcion = dto.Descripcion;
             cita.FechaHora = dto.FechaHora;
             cita.Lugar = dto.Lugar;
+            cita.MinutosAntesNotificar = dto.MinutosAntesNotificar;
+            cita.NotificacionEnviada = false; // Resetear si se actualiza
             cita.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(cita);
@@ -149,7 +152,7 @@ public class CitaService : ICitaService
             string? timeZone = await _usuarioService.GetUserTimeZoneAsync(currentUserId);
             // Devolver la fecha en el timezone del usuario
             var fechaHoraLocal = cita.FechaHora.ToTimeZone(timeZone);
-            var response = new CitaResponse(cita.Id, cita.Titulo, cita.Descripcion, fechaHoraLocal, cita.Lugar, cita.UsuarioId);
+            var response = new CitaResponse(cita.Id, cita.Titulo, cita.Descripcion, fechaHoraLocal, cita.Lugar, cita.MinutosAntesNotificar, cita.UsuarioId);
             return Response<CitaResponse>.Success(response, 200);
         }
         catch (Exception ex)
