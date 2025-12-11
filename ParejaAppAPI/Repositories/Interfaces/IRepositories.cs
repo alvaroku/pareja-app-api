@@ -37,3 +37,8 @@ public interface IParejaRepository : IGenericRepository<Pareja>
     Task<Pareja?> GetParejaActivaByUsuarioIdAsync(int usuarioId);
     Task<Pareja?> GetInvitacionPendienteByUsuariosAsync(int usuario1Id, int usuario2Id);
 }
+
+public interface INotificationRepository : IGenericRepository<Notification>
+{
+    Task<IEnumerable<Notification>> GetByUsuarioIdAsync(int usuarioId);
+}

@@ -9,10 +9,12 @@ namespace ParejaAppAPI.Services;
 public class UsuarioService : IUsuarioService
 {
     private readonly IUsuarioRepository _repository;
+    private readonly IEmailService _emailService;
 
-    public UsuarioService(IUsuarioRepository repository)
+    public UsuarioService(IUsuarioRepository repository, IEmailService emailService)
     {
         _repository = repository;
+        _emailService = emailService;
     }
 
     private ResourceResponse? MapResource(Resource? resource)
@@ -35,7 +37,8 @@ public class UsuarioService : IUsuarioService
                 usuario.Email, 
                 usuario.CodigoPais, 
                 usuario.Telefono, 
-                MapResource(usuario.ProfilePhoto)
+                MapResource(usuario.ProfilePhoto),
+                (int)usuario.Role
             );
             return Response<UsuarioResponse>.Success(response, 200);
         }
@@ -56,7 +59,8 @@ public class UsuarioService : IUsuarioService
                 u.Email, 
                 u.CodigoPais, 
                 u.Telefono, 
-                MapResource(u.ProfilePhoto)
+                MapResource(u.ProfilePhoto),
+                (int)u.Role
             ));
             return Response<IEnumerable<UsuarioResponse>>.Success(response, 200);
         }
@@ -77,7 +81,8 @@ public class UsuarioService : IUsuarioService
                 u.Email, 
                 u.CodigoPais, 
                 u.Telefono, 
-                MapResource(u.ProfilePhoto)
+                MapResource(u.ProfilePhoto),
+                (int)u.Role
             ));
             var pagedResponse = new PagedResponse<UsuarioResponse>(usuarioResponses, pageNumber, pageSize, totalCount);
             return Response<PagedResponse<UsuarioResponse>>.Success(pagedResponse, 200);
@@ -102,17 +107,43 @@ public class UsuarioService : IUsuarioService
                 Nombre = dto.Nombre,
                 Email = dto.Email,
                 PasswordHash = passwordHash,
+                CodigoPais = dto.CodigoPais,
+                Telefono = dto.Telefono,
+                Role = (UserRole)dto.Role,
                 CreatedAt = DateTime.UtcNow
             };
 
             await _repository.AddAsync(usuario);
+
+            // Enviar email con credenciales
+            try
+            {
+                var emailBody = $@"
+                    <h2>Bienvenido a Pareja App</h2>
+                    <p>Hola {usuario.Nombre},</p>
+                    <p>Tu cuenta ha sido creada exitosamente. Aquí están tus credenciales de acceso:</p>
+                    <ul>
+                        <li><strong>Email:</strong> {usuario.Email}</li>
+                        <li><strong>Contraseña:</strong> {dto.Password}</li>
+                    </ul>
+                    <p>Por favor, inicia sesión y cambia tu contraseña lo antes posible.</p>
+                    <p>Saludos,<br>El equipo de Pareja App</p>
+                ";
+                await _emailService.SendCustomEmailAsync(usuario.Email, "Credenciales de acceso - Pareja App", emailBody);
+            }
+            catch
+            {
+                // No fallar la creación si el email falla
+            }
+
             var response = new UsuarioResponse(
                 usuario.Id, 
                 usuario.Nombre, 
                 usuario.Email, 
                 usuario.CodigoPais, 
                 usuario.Telefono, 
-                null
+                null,
+                (int)usuario.Role
             );
             return Response<UsuarioResponse>.Success(response, 201);
         }
@@ -148,9 +179,10 @@ public class UsuarioService : IUsuarioService
 
             usuario.Nombre = dto.Nombre;
             usuario.Email = dto.Email ?? usuario.Email;
-
             usuario.CodigoPais = dto.CodigoPais;
             usuario.Telefono = dto.Telefono;
+            if (dto.Role.HasValue)
+                usuario.Role = (UserRole)dto.Role.Value;
             usuario.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(usuario);
@@ -160,7 +192,8 @@ public class UsuarioService : IUsuarioService
                 usuario.Email, 
                 usuario.CodigoPais, 
                 usuario.Telefono, 
-                MapResource(usuario.ProfilePhoto)
+                MapResource(usuario.ProfilePhoto),
+                (int)usuario.Role
             );
             return Response<UsuarioResponse>.Success(response, 200);
         }

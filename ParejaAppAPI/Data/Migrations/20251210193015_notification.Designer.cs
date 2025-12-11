@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ParejaAppAPI.Data;
 
@@ -11,9 +12,11 @@ using ParejaAppAPI.Data;
 namespace ParejaAppAPI.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251210193015_notification")]
+    partial class notification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,13 +347,7 @@ namespace ParejaAppAPI.Data.Migrations
                     b.Property<int?>("ProfilePhotoId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
                     b.Property<string>("Telefono")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TimeZone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")

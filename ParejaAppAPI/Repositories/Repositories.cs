@@ -124,3 +124,12 @@ public class ParejaRepository : GenericRepository<Pareja>, IParejaRepository
     }
 }
 
+public class NotificationRepository : GenericRepository<Notification>, INotificationRepository
+{
+    public NotificationRepository(AppDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<Notification>> GetByUsuarioIdAsync(int usuarioId)
+    {
+        return await _dbSet.Where(c => c.UserId == usuarioId).ToListAsync();
+    }
+}

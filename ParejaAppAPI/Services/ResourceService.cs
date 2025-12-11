@@ -11,13 +11,13 @@ public class ResourceService : IResourceService
     private readonly IResourceRepository _resourceRepository;
     private readonly IMemoriaRepository _memoriaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
-    private readonly IFirebaseStorageService _firebaseStorage;
+    private readonly IStorageService _firebaseStorage;
 
     public ResourceService(
         IResourceRepository resourceRepository, 
         IMemoriaRepository memoriaRepository, 
         IUsuarioRepository usuarioRepository,
-        IFirebaseStorageService firebaseStorage)
+        IStorageService firebaseStorage)
     {
         _resourceRepository = resourceRepository;
         _memoriaRepository = memoriaRepository;

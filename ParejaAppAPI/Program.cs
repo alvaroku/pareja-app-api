@@ -1,14 +1,15 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using ParejaAppAPI.Data;
 using ParejaAppAPI.Endpoints;
 using ParejaAppAPI.Repositories;
 using ParejaAppAPI.Repositories.Interfaces;
 using ParejaAppAPI.Services;
+using ParejaAppAPI.Services.BackgroundServices;
 using ParejaAppAPI.Services.Interfaces;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,11 +72,12 @@ builder.Services.AddScoped<IMetaRepository, MetaRepository>();
 builder.Services.AddScoped<IMemoriaRepository, MemoriaRepository>();
 builder.Services.AddScoped<IParejaRepository, ParejaRepository>();
 builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 // Services
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+builder.Services.AddScoped<IStorageService, FirebaseStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<ICitaService, CitaService>();
@@ -83,6 +85,12 @@ builder.Services.AddScoped<IMetaService, MetaService>();
 builder.Services.AddScoped<IMemoriaService, MemoriaService>();
 builder.Services.AddScoped<IParejaService, ParejaService>();
 builder.Services.AddScoped<IResourceService, ResourceService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+builder.Services.AddHostedService<NotificationDispatcherWorker>();
+
+builder.Services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
+builder.Services.AddScoped<ISMSService, TwilioSMSService>();
 
 var app = builder.Build();
 
@@ -111,6 +119,7 @@ app.MapParejaEndpoints();
 app.MapCitaEndpoints();
 app.MapMetaEndpoints();
 app.MapMemoriaEndpoints();
+app.MapNotificationEndpoints();
 
 // Ejecutar migraciones autom�ticas al arrancar (sincr�nico para evitar cambiar la firma de Main)
 using (var scope = app.Services.CreateScope())

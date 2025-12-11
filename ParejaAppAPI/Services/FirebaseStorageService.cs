@@ -6,7 +6,7 @@ using System.Text;
 
 namespace ParejaAppAPI.Services;
 
-public class FirebaseStorageService : IFirebaseStorageService
+public class FirebaseStorageService : IStorageService
 {
     private readonly string _bucket;
     private readonly string _credentials;

@@ -42,7 +42,8 @@ public class AuthService : IAuthService
                 usuario.CodigoPais,
                 usuario.Telefono,
                 MapResource(usuario.ProfilePhoto),
-                token
+                token,
+                (int)usuario.Role
             );
 
             return Response<AuthResponse>.Success(response, 200);
@@ -89,7 +90,8 @@ public class AuthService : IAuthService
                 usuario.CodigoPais,
                 usuario.Telefono,
                 null,
-                token
+                token,
+                (int)usuario.Role
             );
 
             return Response<AuthResponse>.Success(response, 201);

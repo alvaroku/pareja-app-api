@@ -92,4 +92,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             ? await _dbSet.CountAsync()
             : await _dbSet.CountAsync(predicate);
     }
+
+    public virtual async Task<bool> Exists(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.AnyAsync(predicate);
+    }
 }

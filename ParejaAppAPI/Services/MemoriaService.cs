@@ -3,7 +3,6 @@ using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Models.Responses;
 using ParejaAppAPI.Repositories.Interfaces;
 using ParejaAppAPI.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace ParejaAppAPI.Services;
 
@@ -12,13 +11,13 @@ public class MemoriaService : IMemoriaService
     private readonly IMemoriaRepository _repository;
     private readonly IParejaRepository _parejaRepository;
     private readonly IResourceRepository _resourceRepository;
-    private readonly IFirebaseStorageService _firebaseStorage;
+    private readonly IStorageService _firebaseStorage;
 
     public MemoriaService(
-        IMemoriaRepository repository, 
+        IMemoriaRepository repository,
         IParejaRepository parejaRepository,
         IResourceRepository resourceRepository,
-        IFirebaseStorageService firebaseStorage)
+        IStorageService firebaseStorage)
     {
         _repository = repository;
         _parejaRepository = parejaRepository;
@@ -68,7 +67,7 @@ public class MemoriaService : IMemoriaService
         try
         {
             var pareja = await _parejaRepository.GetParejaActivaByUsuarioIdAsync(usuarioId);
-            
+
             if (pareja == null)
             {
                 var memoriasUsuario = await _repository.GetByUsuarioIdAsync(usuarioId);
@@ -143,7 +142,7 @@ public class MemoriaService : IMemoriaService
             memoria.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(memoria);
-            
+
             var memoriaConResource = await _repository.GetByIdAsync(id);
             var response = new MemoriaResponse(memoriaConResource!.Id, memoriaConResource.Titulo, memoriaConResource.Descripcion, memoriaConResource.FechaMemoria, memoriaConResource.UsuarioId, MapResource(memoriaConResource.Resource));
             return Response<MemoriaResponse>.Success(response, 200);
