@@ -22,6 +22,12 @@ public static class UsuarioEndpoints
             return Results.Json(response, statusCode: response.StatusCode);
         });
 
+        group.MapPost("/", async ([FromBody] CreateUsuarioDto dto, IUsuarioService service) =>
+        {
+            var response = await service.CreateAsync(dto);
+            return Results.Json(response, statusCode: response.StatusCode);
+        });
+
         group.MapPut("/{id:int}", async (int id, [FromBody] UpdateUsuarioDto dto, IUsuarioService service) =>
         {
             var response = await service.UpdateAsync(id, dto);

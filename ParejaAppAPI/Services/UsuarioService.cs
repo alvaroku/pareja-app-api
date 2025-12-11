@@ -27,18 +27,19 @@ public class UsuarioService : IUsuarioService
     {
         try
         {
-            var usuario = await _repository.GetByIdAsync(id,includes:x=>x.ProfilePhoto);
+            var usuario = await _repository.GetByIdAsync(id, includes: x => x.ProfilePhoto);
             if (usuario == null)
                 return Response<UsuarioResponse>.Failure(404, "Usuario no encontrado");
 
             var response = new UsuarioResponse(
-                usuario.Id, 
-                usuario.Nombre, 
-                usuario.Email, 
-                usuario.CodigoPais, 
-                usuario.Telefono, 
+                usuario.Id,
+                usuario.Nombre,
+                usuario.Email,
+                usuario.CodigoPais,
+                usuario.Telefono,
                 MapResource(usuario.ProfilePhoto),
-                (int)usuario.Role
+                (int)usuario.Role,
+                usuario.TimeZone
             );
             return Response<UsuarioResponse>.Success(response, 200);
         }
@@ -54,13 +55,14 @@ public class UsuarioService : IUsuarioService
         {
             var usuarios = await _repository.GetAllAsync();
             var response = usuarios.Select(u => new UsuarioResponse(
-                u.Id, 
-                u.Nombre, 
-                u.Email, 
-                u.CodigoPais, 
-                u.Telefono, 
+                u.Id,
+                u.Nombre,
+                u.Email,
+                u.CodigoPais,
+                u.Telefono,
                 MapResource(u.ProfilePhoto),
-                (int)u.Role
+                (int)u.Role,
+                u.TimeZone
             ));
             return Response<IEnumerable<UsuarioResponse>>.Success(response, 200);
         }
@@ -76,13 +78,14 @@ public class UsuarioService : IUsuarioService
         {
             var (items, totalCount) = await _repository.GetPagedAsync(pageNumber, pageSize);
             var usuarioResponses = items.Select(u => new UsuarioResponse(
-                u.Id, 
-                u.Nombre, 
-                u.Email, 
-                u.CodigoPais, 
-                u.Telefono, 
+                u.Id,
+                u.Nombre,
+                u.Email,
+                u.CodigoPais,
+                u.Telefono,
                 MapResource(u.ProfilePhoto),
-                (int)u.Role
+                (int)u.Role,
+                u.TimeZone
             ));
             var pagedResponse = new PagedResponse<UsuarioResponse>(usuarioResponses, pageNumber, pageSize, totalCount);
             return Response<PagedResponse<UsuarioResponse>>.Success(pagedResponse, 200);
@@ -110,26 +113,26 @@ public class UsuarioService : IUsuarioService
                 CodigoPais = dto.CodigoPais,
                 Telefono = dto.Telefono,
                 Role = (UserRole)dto.Role,
+                TimeZone = dto.TimeZone,
                 CreatedAt = DateTime.UtcNow
             };
 
             await _repository.AddAsync(usuario);
 
-            // Enviar email con credenciales
+            // Enviar email con credenciales usando template
             try
             {
-                var emailBody = $@"
-                    <h2>Bienvenido a Pareja App</h2>
-                    <p>Hola {usuario.Nombre},</p>
+                var bodyContent = $@"
+                    <p>Hola <strong>{usuario.Nombre}</strong>,</p>
                     <p>Tu cuenta ha sido creada exitosamente. Aquí están tus credenciales de acceso:</p>
-                    <ul>
-                        <li><strong>Email:</strong> {usuario.Email}</li>
-                        <li><strong>Contraseña:</strong> {dto.Password}</li>
-                    </ul>
-                    <p>Por favor, inicia sesión y cambia tu contraseña lo antes posible.</p>
-                    <p>Saludos,<br>El equipo de Pareja App</p>
+                    <div style='background-color: #fdf2f8; border-left: 4px solid #ec4899; padding: 16px; margin: 20px 0; border-radius: 8px;'>
+                        <div style='margin: 8px 0; font-size: 14px;'><span style='font-weight: 600; color: #ec4899;'>Email:</span> <span style='color: #4b5563;'>{usuario.Email}</span></div>
+                        <div style='margin: 8px 0; font-size: 14px;'><span style='font-weight: 600; color: #ec4899;'>Contraseña:</span> <span style='color: #4b5563;'>{dto.Password}</span></div>
+                    </div>
+                    <p>Por favor, inicia sesión y cambia tu contraseña lo antes posible por tu seguridad.</p>
                 ";
-                await _emailService.SendCustomEmailAsync(usuario.Email, "Credenciales de acceso - Pareja App", emailBody);
+                var htmlBody = ParejaAppAPI.Utils.Utilerias.BuildEmailFromTemplate("Bienvenido a Pareja App", bodyContent, null);
+                await _emailService.SendCustomEmailAsync(usuario.Email, "Credenciales de acceso - Pareja App", htmlBody);
             }
             catch
             {
@@ -137,13 +140,14 @@ public class UsuarioService : IUsuarioService
             }
 
             var response = new UsuarioResponse(
-                usuario.Id, 
-                usuario.Nombre, 
-                usuario.Email, 
-                usuario.CodigoPais, 
-                usuario.Telefono, 
+                usuario.Id,
+                usuario.Nombre,
+                usuario.Email,
+                usuario.CodigoPais,
+                usuario.Telefono,
                 null,
-                (int)usuario.Role
+                (int)usuario.Role,
+                usuario.TimeZone
             );
             return Response<UsuarioResponse>.Success(response, 201);
         }
@@ -181,19 +185,21 @@ public class UsuarioService : IUsuarioService
             usuario.Email = dto.Email ?? usuario.Email;
             usuario.CodigoPais = dto.CodigoPais;
             usuario.Telefono = dto.Telefono;
+            usuario.TimeZone = dto.TimeZone;
             if (dto.Role.HasValue)
                 usuario.Role = (UserRole)dto.Role.Value;
             usuario.UpdatedAt = DateTime.UtcNow;
 
             await _repository.UpdateAsync(usuario);
             var response = new UsuarioResponse(
-                usuario.Id, 
-                usuario.Nombre, 
-                usuario.Email, 
-                usuario.CodigoPais, 
-                usuario.Telefono, 
+                usuario.Id,
+                usuario.Nombre,
+                usuario.Email,
+                usuario.CodigoPais,
+                usuario.Telefono,
                 MapResource(usuario.ProfilePhoto),
-                (int)usuario.Role
+                (int)usuario.Role,
+                usuario.TimeZone
             );
             return Response<UsuarioResponse>.Success(response, 200);
         }
@@ -218,5 +224,10 @@ public class UsuarioService : IUsuarioService
         {
             return Response<bool>.Failure(500, "Error al eliminar usuario", new[] { ex.Message });
         }
+    }
+    public async Task<string?> GetUserTimeZoneAsync(int userId)
+    {
+        var usuario = await _repository.GetByIdAsync(userId);
+        return usuario?.TimeZone;
     }
 }

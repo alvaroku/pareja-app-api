@@ -2,13 +2,13 @@ namespace ParejaAppAPI.Models.DTOs;
 
 // Auth DTOs
 public record LoginDto(string Email, string Password);
-public record RegisterDto(string Nombre, string Email, string Password, string? CodigoPais, string? Telefono);
-public record AuthResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource, string Token, int Role);
+public record RegisterDto(string Nombre, string Email, string Password, string? CodigoPais, string? Telefono, string? TimeZone);
+public record AuthResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource, string Token, int Role, string? TimeZone);
 
 // Usuario DTOs
-public record UsuarioResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource, int Role);
-public record CreateUsuarioDto(string Nombre, string Email, string Password, string? CodigoPais, string? Telefono, int Role);
-public record UpdateUsuarioDto(string Nombre, string Email, string? CodigoPais, string? Telefono, int? Role);
+public record UsuarioResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource, int Role, string? TimeZone);
+public record CreateUsuarioDto(string Nombre, string Email, string Password, string? CodigoPais, string? Telefono, int Role, string? TimeZone);
+public record UpdateUsuarioDto(string Nombre, string Email, string? CodigoPais, string? Telefono, int? Role, string? TimeZone);
 
 // Cita DTOs
 public record CitaResponse(int Id, string Titulo, string? Descripcion, DateTime FechaHora, string? Lugar, int UsuarioId);

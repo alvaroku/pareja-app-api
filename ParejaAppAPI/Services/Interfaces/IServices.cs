@@ -17,16 +17,17 @@ public interface IUsuarioService
     Task<Response<UsuarioResponse>> CreateAsync(CreateUsuarioDto dto);
     Task<Response<UsuarioResponse>> UpdateAsync(int id, UpdateUsuarioDto dto);
     Task<Response<bool>> DeleteAsync(int id);
+    Task<string?> GetUserTimeZoneAsync(int userId);
 }
 
 public interface ICitaService
 {
-    Task<Response<CitaResponse>> GetByIdAsync(int id);
-    Task<Response<IEnumerable<CitaResponse>>> GetByUsuarioIdAsync(int usuarioId);
-    Task<Response<IEnumerable<CitaResponse>>> GetByUsuarioYParejaAsync(int usuarioId);
-    Task<Response<PagedResponse<CitaResponse>>> GetPagedAsync(int pageNumber, int pageSize, int? usuarioId = null);
-    Task<Response<CitaResponse>> CreateAsync(CreateCitaDto dto);
-    Task<Response<CitaResponse>> UpdateAsync(int id, UpdateCitaDto dto);
+    Task<Response<CitaResponse>> GetByIdAsync(int id, int currentUserId);
+    Task<Response<IEnumerable<CitaResponse>>> GetByUsuarioIdAsync(int usuarioId, int currentUserId);
+    Task<Response<IEnumerable<CitaResponse>>> GetByUsuarioYParejaAsync(int currentUserId);
+    Task<Response<PagedResponse<CitaResponse>>> GetPagedAsync(int pageNumber, int pageSize, int currentUserId, int? usuarioId = null);
+    Task<Response<CitaResponse>> CreateAsync(CreateCitaDto dto, int currentUserId);
+    Task<Response<CitaResponse>> UpdateAsync(int id, UpdateCitaDto dto, int currentUserId);
     Task<Response<bool>> DeleteAsync(int id);
 }
 

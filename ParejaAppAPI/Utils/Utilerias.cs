@@ -61,10 +61,7 @@
             template = template.Replace("{{SUBJECT}}", title);
             template = template.Replace("{{TITLE}}", title);
 
-            // Format body with proper HTML paragraphs
-            var formattedBody = string.Join("", body.Split('\n').Select(line =>
-                string.IsNullOrWhiteSpace(line) ? "" : $"<p>{line}</p>"));
-            template = template.Replace("{{BODY}}", formattedBody);
+            template = template.Replace("{{BODY}}", body);
 
             // Build additional data section
             var additionalDataHtml = "";

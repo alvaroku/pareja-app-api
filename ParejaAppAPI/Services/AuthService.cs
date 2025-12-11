@@ -43,7 +43,8 @@ public class AuthService : IAuthService
                 usuario.Telefono,
                 MapResource(usuario.ProfilePhoto),
                 token,
-                (int)usuario.Role
+                (int)usuario.Role,
+                usuario.TimeZone
             );
 
             return Response<AuthResponse>.Success(response, 200);
@@ -77,6 +78,7 @@ public class AuthService : IAuthService
                 PasswordHash = passwordHash,
                 CodigoPais = dto.CodigoPais,
                 Telefono = dto.Telefono,
+                TimeZone = dto.TimeZone,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -91,7 +93,8 @@ public class AuthService : IAuthService
                 usuario.Telefono,
                 null,
                 token,
-                (int)usuario.Role
+                (int)usuario.Role,
+                usuario.TimeZone
             );
 
             return Response<AuthResponse>.Success(response, 201);
