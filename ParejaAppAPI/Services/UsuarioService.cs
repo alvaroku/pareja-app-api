@@ -1,8 +1,10 @@
+using Microsoft.Extensions.Configuration;
 using ParejaAppAPI.Models.DTOs;
 using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Models.Responses;
 using ParejaAppAPI.Repositories.Interfaces;
 using ParejaAppAPI.Services.Interfaces;
+using ParejaAppAPI.Utils;
 
 namespace ParejaAppAPI.Services;
 
@@ -10,11 +12,13 @@ public class UsuarioService : IUsuarioService
 {
     private readonly IUsuarioRepository _repository;
     private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
 
-    public UsuarioService(IUsuarioRepository repository, IEmailService emailService)
+    public UsuarioService(IUsuarioRepository repository, IEmailService emailService, IConfiguration configuration)
     {
         _repository = repository;
         _emailService = emailService;
+        _configuration = configuration;
     }
 
     private ResourceResponse? MapResource(Resource? resource)
@@ -122,6 +126,9 @@ public class UsuarioService : IUsuarioService
             // Enviar email con credenciales usando template
             try
             {
+                var frontendUrl = _configuration["FrontendUrl"];
+                var loginUrl = $"{frontendUrl}/login";
+                
                 var bodyContent = $@"
                     <p>Hola <strong>{usuario.Nombre}</strong>,</p>
                     <p>Tu cuenta ha sido creada exitosamente. Aquí están tus credenciales de acceso:</p>
@@ -130,8 +137,12 @@ public class UsuarioService : IUsuarioService
                         <div style='margin: 8px 0; font-size: 14px;'><span style='font-weight: 600; color: #ec4899;'>Contraseña:</span> <span style='color: #4b5563;'>{dto.Password}</span></div>
                     </div>
                     <p>Por favor, inicia sesión y cambia tu contraseña lo antes posible por tu seguridad.</p>
+                    
+                    <div style='text-align: center; margin: 30px 0;'>
+                        <a href='{loginUrl}' style='display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%); color: white; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 16px;'>Iniciar Sesión</a>
+                    </div>
                 ";
-                var htmlBody = ParejaAppAPI.Utils.Utilerias.BuildEmailFromTemplate("Bienvenido a Pareja App", bodyContent, null);
+                var htmlBody = Utilerias.BuildEmailFromTemplate("Bienvenido a Pareja App", bodyContent, null);
                 await _emailService.SendCustomEmailAsync(usuario.Email, "Credenciales de acceso - Pareja App", htmlBody);
             }
             catch
