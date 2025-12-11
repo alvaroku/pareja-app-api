@@ -178,7 +178,12 @@ namespace ParejaAppAPI.Services.BackgroundServices
             if (pareja != null)
             {
                 var parejaUsuario = pareja.UsuarioEnviaId == cita.UsuarioId ? pareja.UsuarioRecibe : pareja.UsuarioEnvia;
-                var mensajePareja = $"Recordatorio: Tu pareja {cita.Usuario.Nombre} tiene una cita '{cita.Titulo}' el {fechaFormateada}";
+
+                var fechaHoraLocalPareja = cita.FechaHora.ToTimeZone(parejaUsuario.TimeZone);
+                var fechaFormateadaPareja = fechaHoraLocalPareja.ToString("dd/MM/yyyy HH:mm");
+
+               
+                var mensajePareja = $"Recordatorio: Tu pareja {cita.Usuario.Nombre} tiene una cita '{cita.Titulo}' el {fechaFormateadaPareja}";
 
                 // Enviar push a la pareja
                 try
@@ -203,8 +208,7 @@ namespace ParejaAppAPI.Services.BackgroundServices
                 // Enviar email a la pareja
                 try
                 {
-                    var fechaHoraLocalPareja = cita.FechaHora.ToTimeZone(parejaUsuario.TimeZone);
-                    var fechaFormateadaPareja = fechaHoraLocalPareja.ToString("dd/MM/yyyy HH:mm");
+
 
                     var emailBodyPareja = $@"
                         <p>Hola <strong>{parejaUsuario.Nombre}</strong>,</p>
