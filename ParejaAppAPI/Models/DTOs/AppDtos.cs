@@ -32,7 +32,7 @@ public record ResourceResponse(int Id, string Nombre, string Extension, long Tam
 public record UploadResourceDto(string Nombre, string Extension, string ContentType, int Tipo);
 
 // Pareja DTOs
-public record ParejaResponse(int Id, int UsuarioEnviaId, int UsuarioRecibeId, string UsuarioEnviaNombre, string UsuarioRecibeNombre, string UsuarioEnviaEmail, string UsuarioRecibeEmail, int Estado, DateTime CreatedAt);
+public record ParejaResponse(int Id, int UsuarioEnviaId, int UsuarioRecibeId, string UsuarioEnviaNombre, string UsuarioRecibeNombre, string UsuarioEnviaEmail, string UsuarioRecibeEmail, int Estado, DateTime CreatedAt, string? UsuarioEnviaFoto=null,string? UsuarioRecibeFoto=null);
 public record EnviarInvitacionDto(string EmailPareja);
 public record ResponderInvitacionDto(int ParejaId, int Estado); // 1 = Aceptar, 2 = Rechazar
 
@@ -82,3 +82,6 @@ public class PaginateParams
     public int PageSize { get; set; } = 10;
 
 }
+
+// Menu 
+public record MenuModel(int Id, string Nombre);

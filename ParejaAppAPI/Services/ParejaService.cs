@@ -31,11 +31,12 @@ public class ParejaService : IParejaService
             if (pareja == null)
             {
                 // Buscar invitación pendiente (enviada o recibida)
-                var invitacionPendiente = await _parejaRepository.GetAllAsync();
-                var pendiente = invitacionPendiente.FirstOrDefault(p => 
-                    (p.UsuarioEnviaId == usuarioId || p.UsuarioRecibeId == usuarioId) 
-                    && p.Estado == EstadoInvitacion.Pendiente 
+                var invitacionPendiente = await _parejaRepository.Get(p =>
+                    (p.UsuarioEnviaId == usuarioId || p.UsuarioRecibeId == usuarioId)
+                    && p.Estado == EstadoInvitacion.Pendiente
                     && !p.IsDeleted);
+
+                var pendiente = invitacionPendiente.FirstOrDefault();
 
                 if (pendiente != null)
                 {
@@ -51,7 +52,9 @@ public class ParejaService : IParejaService
                         usuarioEnvia?.Email ?? "",
                         usuarioRecibe?.Email ?? "",
                         (int)pendiente.Estado,
-                        pendiente.CreatedAt
+                        pendiente.CreatedAt,
+                        null,
+                        null
                     );
                     return Response<ParejaResponse?>.Success(response, 200);
                 }
@@ -68,7 +71,9 @@ public class ParejaService : IParejaService
                 pareja.UsuarioEnvia?.Email ?? "",
                 pareja.UsuarioRecibe?.Email ?? "",
                 (int)pareja.Estado,
-                pareja.CreatedAt
+                pareja.CreatedAt,
+                pareja.UsuarioEnvia?.ProfilePhoto?.UrlPublica,
+                pareja.UsuarioRecibe?.ProfilePhoto?.UrlPublica
             );
 
             return Response<ParejaResponse?>.Success(responseData, 200);

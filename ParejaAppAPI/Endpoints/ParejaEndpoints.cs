@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ParejaAppAPI.Models.DTOs;
+using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Services.Interfaces;
 using System.Security.Claims;
 
@@ -9,7 +10,8 @@ public static class ParejaEndpoints
 {
     public static void MapParejaEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/pareja").WithTags("Pareja").RequireAuthorization();
+        var group = routes.MapGroup("/api/pareja").WithTags("Pareja")
+         .RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(), UserRole.SuperAdmin.ToString()));
 
         // Obtener pareja activa o invitación pendiente del usuario
         group.MapGet("/", async (ClaimsPrincipal user, IParejaService service) =>

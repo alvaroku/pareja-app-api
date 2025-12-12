@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ParejaAppAPI.Models.DTOs;
+using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Services.Interfaces;
 using System.Security.Claims;
 
@@ -9,7 +10,8 @@ public static class MetaEndpoints
 {
     public static void MapMetaEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/metas").WithTags("Metas").RequireAuthorization();
+        var group = routes.MapGroup("/api/metas").WithTags("Metas")
+         .RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(), UserRole.SuperAdmin.ToString()));;
 
         group.MapGet("/{id:int}", async (int id, IMetaService service) =>
         {

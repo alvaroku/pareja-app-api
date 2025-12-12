@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ParejaAppAPI.Models.DTOs;
+using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Services.Interfaces;
 
 namespace ParejaAppAPI.Endpoints;
@@ -8,37 +9,38 @@ public static class UsuarioEndpoints
 {
     public static void MapUsuarioEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/usuarios").WithTags("Usuarios").RequireAuthorization();
+        var group = routes.MapGroup("/api/usuarios").WithTags("Usuarios")
+         .RequireAuthorization();
 
         group.MapGet("/{id:int}", async (int id, IUsuarioService service) =>
         {
             var response = await service.GetByIdAsync(id);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(),UserRole.SuperAdmin.ToString()));
 
         group.MapGet("/", async ([FromQuery] int pageNumber, [FromQuery] int pageSize, IUsuarioService service) =>
         {
             var response = await service.GetPagedAsync(pageNumber, pageSize);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.SuperAdmin.ToString()));
 
         group.MapPost("/", async ([FromBody] CreateUsuarioDto dto, IUsuarioService service) =>
         {
             var response = await service.CreateAsync(dto);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.SuperAdmin.ToString()));
 
         group.MapPut("/{id:int}", async (int id, [FromBody] UpdateUsuarioDto dto, IUsuarioService service) =>
         {
             var response = await service.UpdateAsync(id, dto);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(), UserRole.SuperAdmin.ToString()));
 
         group.MapDelete("/{id:int}", async (int id, IUsuarioService service) =>
         {
             var response = await service.DeleteAsync(id);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.SuperAdmin.ToString()));
 
         group.MapPost("/{id:int}/upload-photo", async (int id, HttpRequest request, IResourceService resourceService) =>
         {
@@ -64,7 +66,7 @@ public static class UsuarioEndpoints
             using var stream = file.OpenReadStream();
             var response = await resourceService.UploadForUsuarioAsync(id, stream, file.FileName, file.ContentType);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(), UserRole.SuperAdmin.ToString()));
 
         group.MapDelete("/{id:int}/delete-photo", async (int id, IUsuarioService usuarioService, IResourceService resourceService) =>
         {
@@ -77,6 +79,6 @@ public static class UsuarioEndpoints
 
             var response = await resourceService.DeleteAsync(usuarioResult.Data.Resource.Id);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(), UserRole.SuperAdmin.ToString()));
     }
 }

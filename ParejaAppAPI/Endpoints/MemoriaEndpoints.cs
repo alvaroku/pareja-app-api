@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ParejaAppAPI.Models.DTOs;
+using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Services.Interfaces;
 using System.Security.Claims;
 
@@ -9,7 +10,8 @@ public static class MemoriaEndpoints
 {
     public static void MapMemoriaEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/memorias").WithTags("Memorias").RequireAuthorization();
+        var group = routes.MapGroup("/api/memorias").WithTags("Memorias")
+         .RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(), UserRole.SuperAdmin.ToString()));;
 
         group.MapGet("/{id:int}", async (int id, IMemoriaService service) =>
         {

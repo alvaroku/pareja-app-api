@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ParejaAppAPI.Models.DTOs;
+using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Services.Interfaces;
 using System.Security.Claims;
 
@@ -15,7 +16,7 @@ public static class NotificationEndpoints
         {
             var response = await service.Create(dto);
             return Results.Json(response, statusCode: response.StatusCode);
-        });
+        }).RequireAuthorization(policy => policy.RequireRole(UserRole.SuperAdmin.ToString()));;
 
         group.MapGet("user/{userId:int}", async (int userId, INotificationService service) =>
         {

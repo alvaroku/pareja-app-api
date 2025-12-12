@@ -103,8 +103,8 @@ public class ParejaRepository : GenericRepository<Pareja>, IParejaRepository
     public async Task<Pareja?> GetParejaActivaByUsuarioIdAsync(int usuarioId)
     {
         return await _dbSet
-            .Include(p => p.UsuarioEnvia)
-            .Include(p => p.UsuarioRecibe)
+            .Include(p => p.UsuarioEnvia).ThenInclude(u => u.ProfilePhoto)
+            .Include(p => p.UsuarioRecibe).ThenInclude(u => u.ProfilePhoto)
             .Where(p => (p.UsuarioEnviaId == usuarioId || p.UsuarioRecibeId == usuarioId) 
                      && p.Estado == EstadoInvitacion.Aceptada 
                      && !p.IsDeleted)

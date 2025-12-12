@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ParejaAppAPI.Models.DTOs;
+using ParejaAppAPI.Models.Entities;
 using ParejaAppAPI.Repositories.Interfaces;
 using ParejaAppAPI.Services.Interfaces;
 using System.Security.Claims;
@@ -10,7 +11,10 @@ public static class CitaEndpoints
 {
     public static void MapCitaEndpoints(this IEndpointRouteBuilder routes)
     {
-        var group = routes.MapGroup("/api/citas").WithTags("Citas").RequireAuthorization();
+        // Citas: Accesible por User y SuperAdmin
+        var group = routes.MapGroup("/api/citas")
+            .WithTags("Citas")
+            .RequireAuthorization(policy => policy.RequireRole(UserRole.User.ToString(), UserRole.SuperAdmin.ToString()));
 
         group.MapGet("/{id:int}", async (int id, ClaimsPrincipal user, ICitaService service, IUsuarioRepository usuarioRepository) =>
         {

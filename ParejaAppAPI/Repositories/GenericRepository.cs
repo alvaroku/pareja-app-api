@@ -29,7 +29,14 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         query = includes.Aggregate(query, (current, include) => current.Include(include));
         return await query.ToListAsync();
     }
-
+    public virtual async Task<IEnumerable<T>> Get(Expression<Func<T, bool>>? predicate = null, params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _dbSet;
+        if (predicate != null)
+            query = query.Where(predicate);
+        query = includes.Aggregate(query, (current, include) => current.Include(include));
+        return await query.ToListAsync();
+    }
     public virtual async Task<IEnumerable<T>> FindAsync(
         Expression<Func<T, bool>> predicate,
         params Expression<Func<T, object>>[] includes)
