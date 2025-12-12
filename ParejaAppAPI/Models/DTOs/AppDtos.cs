@@ -4,6 +4,8 @@ namespace ParejaAppAPI.Models.DTOs;
 public record LoginDto(string Email, string Password);
 public record RegisterDto(string Nombre, string Email, string Password, string? CodigoPais, string? Telefono, string? TimeZone);
 public record AuthResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource, string Token, int Role, string? TimeZone);
+public record RequestPasswordRecoveryDto(string Email);
+public record ResetPasswordDto(Guid Token, string Email, string NewPassword);
 
 // Usuario DTOs
 public record UsuarioResponse(int Id, string Nombre, string Email, string? CodigoPais, string? Telefono, ResourceResponse? Resource, int Role, string? TimeZone);

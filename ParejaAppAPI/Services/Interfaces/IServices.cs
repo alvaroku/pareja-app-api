@@ -7,6 +7,8 @@ public interface IAuthService
 {
     Task<Response<AuthResponse>> LoginAsync(LoginDto dto);
     Task<Response<AuthResponse>> RegisterAsync(RegisterDto dto);
+    Task<Response<string>> RequestPasswordRecoveryAsync(RequestPasswordRecoveryDto dto);
+    Task<Response<string>> ResetPasswordAsync(ResetPasswordDto dto);
 }
 
 public interface IUsuarioService

@@ -73,6 +73,7 @@ builder.Services.AddScoped<IMemoriaRepository, MemoriaRepository>();
 builder.Services.AddScoped<IParejaRepository, ParejaRepository>();
 builder.Services.AddScoped<IResourceRepository, ResourceRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IRecoveryTokenRepository, RecoveryTokenRepository>();
 
 // Services
 builder.Services.AddScoped<JwtService>();

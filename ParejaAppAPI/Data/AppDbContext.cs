@@ -24,7 +24,8 @@ public class AppDbContext : DbContext
     public DbSet<Pareja> Parejas { get; set; }
     public DbSet<Resource> Resources { get; set; }
     public DbSet<Notification> Notifications { get; set; }  
-    public DbSet<DeviceToken> DeviceTokens { get; set; }  
+    public DbSet<DeviceToken> DeviceTokens { get; set; }
+    public DbSet<RecoveryToken> RecoveryTokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

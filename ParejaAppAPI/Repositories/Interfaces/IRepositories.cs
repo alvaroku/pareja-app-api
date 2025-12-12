@@ -42,3 +42,10 @@ public interface INotificationRepository : IGenericRepository<Notification>
 {
     Task<IEnumerable<Notification>> GetByUsuarioIdAsync(int usuarioId);
 }
+
+public interface IRecoveryTokenRepository : IGenericRepository<RecoveryToken>
+{
+    Task<RecoveryToken?> GetByTokenAsync(Guid token,string email);
+    Task<RecoveryToken?> GetValidTokenByEmailAsync(string email);
+    Task InvalidateTokensByUsuarioIdAsync(int usuarioId);
+}

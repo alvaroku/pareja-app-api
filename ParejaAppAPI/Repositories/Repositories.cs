@@ -133,3 +133,32 @@ public class NotificationRepository : GenericRepository<Notification>, INotifica
         return await _dbSet.Where(c => c.UserId == usuarioId).ToListAsync();
     }
 }
+
+public class RecoveryTokenRepository : GenericRepository<RecoveryToken>, IRecoveryTokenRepository
+{
+    public RecoveryTokenRepository(AppDbContext context) : base(context) { }
+
+    public async Task<RecoveryToken?> GetByTokenAsync(Guid token,string email)
+    {
+        return await _dbSet
+            .Include(rt => rt.Usuario)
+            .FirstOrDefaultAsync(rt => rt.Token == token && rt.Usuario.Email == email && !rt.IsUsed && !rt.IsDeleted && rt.ExpiresAt > DateTime.UtcNow);
+    }
+
+    public async Task<RecoveryToken?> GetValidTokenByEmailAsync(string email)
+    {
+        return await _dbSet
+            .Include(rt => rt.Usuario)
+            .Where(rt => rt.Usuario.Email == email && !rt.IsUsed && !rt.IsDeleted && rt.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(rt => rt.CreatedAt)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task InvalidateTokensByUsuarioIdAsync(int usuarioId)
+    {
+        var tokens = await _dbSet
+            .Where(rt => rt.UsuarioId == usuarioId && !rt.IsUsed && !rt.IsDeleted)
+            .ExecuteUpdateAsync(x=>x.SetProperty(t => t.IsUsed, t => true).SetProperty(t => t.UpdatedAt, t => DateTime.UtcNow));
+        await _context.SaveChangesAsync();
+    }
+}

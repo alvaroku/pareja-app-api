@@ -18,4 +18,5 @@ public class Usuario : BaseEntity
     public virtual ICollection<Memoria> Memorias { get; set; } = new List<Memoria>();
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     public virtual ICollection<DeviceToken> DeviceTokens { get; set; } = new List<DeviceToken>();
+    public virtual ICollection<RecoveryToken> RecoveryTokens { get; set; } = new List<RecoveryToken>();
 }

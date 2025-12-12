@@ -21,5 +21,17 @@ public static class AuthEndpoints
             var response = await authService.RegisterAsync(dto);
             return Results.Json(response, statusCode: response.StatusCode);
         });
+
+        group.MapPost("/request-password-recovery", async ([FromBody] RequestPasswordRecoveryDto dto, IAuthService authService) =>
+        {
+            var response = await authService.RequestPasswordRecoveryAsync(dto);
+            return Results.Json(response, statusCode: response.StatusCode);
+        });
+
+        group.MapPost("/reset-password", async ([FromBody] ResetPasswordDto dto, IAuthService authService) =>
+        {
+            var response = await authService.ResetPasswordAsync(dto);
+            return Results.Json(response, statusCode: response.StatusCode);
+        });
     }
 }
